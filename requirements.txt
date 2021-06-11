@@ -1,0 +1,7 @@
+Django
+djangorestframework
+tqdm
+requests
+django-heroku
+djangorestframework_simplejwt
+gunicorn
