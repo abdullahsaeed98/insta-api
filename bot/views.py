@@ -193,7 +193,9 @@ class request_bot:
         edges = info.get('graphql').get('user').get("edge_owner_to_timeline_media").get('edges')
         return edges
 
-    def get_all_likers(self,media_code,total_likes=None):
+    def get_all_likers(self,link,total_likes=None):
+
+        media_code = link.rsplit('/')[-1] if bool(link.rsplit('/')[-1]) else link.rsplit('/')[-2]
         self.load_session()
         all_likers = []
         urlScraping='https://www.instagram.com/graphql/query/?query_hash=d5d763b1e2acf209d62d22d184488e57&variables={"shortcode":"codeSHORT","include_reel":true,"first":50,"after":"max_id"}'
@@ -308,3 +310,15 @@ def getPostsView(request):
     except Exception as e:
         return JsonResponse({'status': "fail",'msg':str(e)})
 
+
+@api_view(['POST'])
+def getPostLikersView(request):
+    target_post_link = request.data.get('link')
+
+    try:
+        insta_account = settings.INSTA_ACCOUNTS[random.randint(0,len(settings.INSTA_ACCOUNTS)-1)]
+        bot = request_bot(insta_account.get('username'),insta_account.get('password'))
+        likers = bot.get_all_likers(target_post_link)
+        return JsonResponse({'status': "pass",'likers':likers})
+    except Exception as e:
+        return JsonResponse({'status': "fail",'msg':str(e)})
